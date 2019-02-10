@@ -26,4 +26,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * リレーションシップ - photosテーブル
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function photos()
+    {
+        // ユーザと写真は一対多の関係であることを示している
+        return $this->hasMany('App\Photo');
+    }
 }
