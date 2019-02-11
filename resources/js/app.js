@@ -14,6 +14,6 @@ const createApp = async () => {
         components: {App}, // ルートコンポーネントの使用を宣言する
         template: '<App />' // ルートコンポーネントを描画している
     });
-}
+};
 
 createApp();
