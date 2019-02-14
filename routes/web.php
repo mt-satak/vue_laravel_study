@@ -11,6 +11,9 @@
 |
 */
 
+// 写真ダウンロード(※indexを返すルートより先に処理する必要がある)
+Route::get('/photos/{photo}/download', 'PhotoController@download');
+
 Route::get('/{any?}', function () {
     return view('index');
 })->where('any', '.+');

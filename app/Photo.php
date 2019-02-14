@@ -3,11 +3,34 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Photo extends Model
 {
     /** プライマリキーの型 */
     protected $keyType = 'string';
+
+    /** JSONに"明示的に"含める属性 */
+    protected $appends = [
+        // ユーザー定義のアクセサはデフォルトではJSONに含まれないため(リレーションも)
+        'url',
+    ];
+
+    /** JSONに含める属性($hiddenの逆) */
+    protected $visible = [
+        'id', 'owner', 'url',
+    ];
+
+    // ↑↓は同義
+
+//    /** 登録項目はJSONに含めない属性(それ以外は基本ルールに従う) */
+//    protected $hidden = [
+//        // 元からある属性はデフォルトでJSONに含まれるがいらないものは除外することができる
+//        'user_id', 'filename', self::CREATED_AT, self::UPDATED_AT,
+//    ];
+
+    // 1ページあたりの項目数
+    protected $perPage = 5;
 
     /** IDの桁数 */
     const ID_LENGTH = 12;
@@ -53,5 +76,27 @@ class Photo extends Model
         }
 
         return $id;
+    }
+
+    /**
+     * リレーションシップ - usersテーブル
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner()
+    {
+        // belongsTo: Define an inverse one-to-one or many relationship.
+        return $this->belongsTo('App\User', 'user_id', 'id', 'users');
+    }
+
+    /**
+     * アクセサ - url
+     *
+     * @return string
+     */
+    public function getUrlAttribute()
+    {
+        // S3 上のファイルの公開URLを返却する
+        return Storage::cloud()->url($this->attributes['filename']);
     }
 }
