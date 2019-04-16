@@ -3,11 +3,11 @@ import VueRouter from 'vue-router';
 
 // ページコンポーネントをインポートする
 import PhotoList from './pages/PhotoList.vue';
+import PhotoDetail from './pages/PhotoDetail.vue';
 import Login from './pages/Login.vue';
+import SystemError from './pages/errors/System.vue';
 
 import store from './store';
-import SystemError from './pages/errors/System.vue';
-import PhotoDetail from './pages/PhotoDetail.vue';
 
 // VueRouterプラグインを使用する
 Vue.use(VueRouter);
@@ -18,7 +18,7 @@ const routes = [
         path: '/',
         component: PhotoList,
         props: route => {
-            const page = route.query.page;
+            const page = route.query.page
             return { page: /^[1-9][0-9]*$/.test(page) ? page * 1 : 1 }
         }
     },
@@ -47,6 +47,9 @@ const routes = [
 // VueRouterインスタンスを生成する
 const router = new VueRouter({
     mode: 'history',
+    scrollBehavior () {
+        return { x: 0, y: 0 }
+    },
     routes
 });
 

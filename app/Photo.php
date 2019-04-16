@@ -10,6 +10,9 @@ class Photo extends Model
     /** プライマリキーの型 */
     protected $keyType = 'string';
 
+    /** IDの桁数 */
+    const ID_LENGTH = 12;
+
     /** JSONに"明示的に"含める属性 */
     protected $appends = [
         // ユーザー定義のアクセサはデフォルトではJSONに含まれないため(リレーションも)
@@ -31,9 +34,6 @@ class Photo extends Model
 
     // 1ページあたりの項目数
     protected $perPage = 5;
-
-    /** IDの桁数 */
-    const ID_LENGTH = 12;
 
     public function __construct(array $attributes = [])
     {
@@ -79,17 +79,6 @@ class Photo extends Model
     }
 
     /**
-     * リレーションシップ - usersテーブル
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function owner()
-    {
-        // belongsTo: Define an inverse one-to-one or many relationship.
-        return $this->belongsTo('App\User', 'user_id', 'id', 'users');
-    }
-
-    /**
      * アクセサ - url
      *
      * @return string
@@ -98,5 +87,14 @@ class Photo extends Model
     {
         // S3 上のファイルの公開URLを返却する
         return Storage::cloud()->url($this->attributes['filename']);
+    }
+
+    /**
+     * リレーションシップ - usersテーブル
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner()
+    {
+        return $this->belongsTo('App\User', 'user_id', 'id', 'users');
     }
 }

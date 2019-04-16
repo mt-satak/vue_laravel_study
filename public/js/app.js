@@ -2087,11 +2087,52 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     item: {
       type: Object,
       required: true
+    }
+  },
+  data: function data() {
+    return {
+      landscape: false,
+      portrait: false
+    };
+  },
+  computed: {
+    imageClass: function imageClass() {
+      return {
+        // 横長クラス
+        'photo__image--landscape': this.landscape,
+        // 縦長クラス
+        'photo__image--portrait': this.portrait
+      };
+    }
+  },
+  methods: {
+    setAspectRatio: function setAspectRatio() {
+      if (!this.$refs.image) {
+        return false;
+      }
+
+      var height = this.$refs.image.clientHeight;
+      var width = this.$refs.image.clientWidth; // 縦横比率 3:4 よりも横長の画像
+
+      this.landscape = height / width <= 0.75; // 横長でなければ縦長
+
+      this.portrait = !this.landscape;
+    }
+  },
+  watch: {
+    $route: function $route() {
+      // ページが切り替わってから画像が読み込まれるまでの間に
+      // 前のページの同じ位置にあった画像の表示が残ってしまうことを防ぐ
+      this.landscape = false;
+      this.portrait = false;
     }
   }
 });
@@ -2519,7 +2560,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return axios.get('/api/photos/?page=${this.page}');
+                return axios.get("/api/photos/?page=".concat(this.page));
 
               case 2:
                 response = _context.sent;
@@ -4185,8 +4226,11 @@ var render = function() {
     [
       _c("figure", { staticClass: "photo__wrapper" }, [
         _c("img", {
-          staticClass: "photo__image photo__image--portrait",
-          attrs: { src: _vm.item.url, alt: "Photo by " + _vm.item.owner.name }
+          ref: "image",
+          staticClass: "photo__image",
+          class: _vm.imageClass,
+          attrs: { src: _vm.item.url, alt: "Photo by " + _vm.item.owner.name },
+          on: { load: _vm.setAspectRatio }
         })
       ]),
       _vm._v(" "),
@@ -20635,10 +20679,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
 /* harmony import */ var _pages_PhotoList_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/PhotoList.vue */ "./resources/js/pages/PhotoList.vue");
-/* harmony import */ var _pages_Login_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/Login.vue */ "./resources/js/pages/Login.vue");
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./store */ "./resources/js/store/index.js");
+/* harmony import */ var _pages_PhotoDetail_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/PhotoDetail.vue */ "./resources/js/pages/PhotoDetail.vue");
+/* harmony import */ var _pages_Login_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./pages/Login.vue */ "./resources/js/pages/Login.vue");
 /* harmony import */ var _pages_errors_System_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./pages/errors/System.vue */ "./resources/js/pages/errors/System.vue");
-/* harmony import */ var _pages_PhotoDetail_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./pages/PhotoDetail.vue */ "./resources/js/pages/PhotoDetail.vue");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./store */ "./resources/js/store/index.js");
 
  // ページコンポーネントをインポートする
 
@@ -20662,13 +20706,13 @@ var routes = [{
 }, {
   path: '/photos/:id',
   // 写真idが利用される
-  component: _pages_PhotoDetail_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+  component: _pages_PhotoDetail_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
   props: true
 }, {
   path: '/login',
-  component: _pages_Login_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+  component: _pages_Login_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
   beforeEnter: function beforeEnter(to, from, next) {
-    if (_store__WEBPACK_IMPORTED_MODULE_4__["default"].getters['auth/check']) {
+    if (_store__WEBPACK_IMPORTED_MODULE_6__["default"].getters['auth/check']) {
       next('/');
     } else {
       next();
@@ -20681,6 +20725,12 @@ var routes = [{
 
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   mode: 'history',
+  scrollBehavior: function scrollBehavior() {
+    return {
+      x: 0,
+      y: 0
+    };
+  },
   routes: routes
 }); // VueRouterインスタンスをエクスポート(app.jsでインポートさせたい)
 
