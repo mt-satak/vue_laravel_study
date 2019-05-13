@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Comment;
+use App\Http\Requests\StoreComment;
 use App\Http\Requests\StorePhoto;
 use App\Photo;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -47,7 +50,7 @@ class PhotoController extends Controller
      * 写真投稿
      *
      * @param StorePhoto $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      * @throws \Exception
      */
     public function create(StorePhoto $request)
@@ -83,10 +86,29 @@ class PhotoController extends Controller
     }
 
     /**
+     * コメント投稿
+     * @param Photo $photo
+     * @param StoreComment $request
+     * @return \Illuminate\Http\Response
+     */
+    public function addComment(Photo $photo, StoreComment $request)
+    {
+        $comment = new Comment();
+        $comment->content = $request->get('content');
+        $comment->user_id = Auth::user()->id;
+        $photo->comments()->save($comment);
+
+        // authorリレーションをロードするためにコメントを取得しなおす
+        $new_comment = Comment::where('id', $comment->id)->with('author')->first();
+
+        return response($new_comment, 201);
+    }
+
+    /**
      * 写真ダウンロード
      *
      * @param Photo $photo
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function download(Photo $photo)
     {

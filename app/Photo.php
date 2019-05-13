@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Photo extends Model
 {
@@ -21,7 +23,7 @@ class Photo extends Model
 
     /** JSONに含める属性($hiddenの逆) */
     protected $visible = [
-        'id', 'owner', 'url',
+        'id', 'owner', 'url', 'comments',
     ];
 
     // ↑↓は同義
@@ -91,10 +93,19 @@ class Photo extends Model
 
     /**
      * リレーションシップ - usersテーブル
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function owner()
     {
         return $this->belongsTo('App\User', 'user_id', 'id', 'users');
+    }
+
+    /**
+     * リレーションシップ - commentsテーブル
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comments()
+    {
+        return $this->hasMany('App\Comment')->orderBy('id', 'desc');
     }
 }
