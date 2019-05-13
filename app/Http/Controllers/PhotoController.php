@@ -14,7 +14,7 @@ class PhotoController extends Controller
     public function __construct()
     {
         // 認証が必要
-        $this->middleware('auth')->except(['index', 'download']);
+        $this->middleware('auth')->except(['index', 'download', 'show']);
     }
 
     /**
@@ -27,6 +27,20 @@ class PhotoController extends Controller
             ->orderBy(Photo::CREATED_AT, 'desc')->paginate();
 
         return $photos;
+    }
+
+    /**
+     * 写真詳細
+     *
+     * @param string $id
+     * @return Photo
+     */
+    public function show(string $id)
+    {
+        $photo = Photo::where('id', $id)->with(['owner'])->first();
+
+        // 写真データが見つからなければ404を返す
+        return $photo ?? abort(404);
     }
 
     /**
