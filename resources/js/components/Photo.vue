@@ -55,7 +55,7 @@
         },
         computed: {
             imageClass () {
-                return {1
+                return {
                     // 横長クラス
                     'photo__image--landscape': this.landscape,
                     // 縦長クラス

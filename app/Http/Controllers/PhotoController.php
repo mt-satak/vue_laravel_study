@@ -26,7 +26,7 @@ class PhotoController extends Controller
     public function index()
     {
         // where in句で取ってきた写真を追加日時の降順に取ってきて paginate() でページ送りする
-        $photos = Photo::with(['owner'])
+        $photos = Photo::with(['owner', 'likes'])
             ->orderBy(Photo::CREATED_AT, 'desc')->paginate();
 
         return $photos;
@@ -41,7 +41,7 @@ class PhotoController extends Controller
     public function show(string $id)
     {
         $photo = Photo::where('id', $id)
-            ->with(['owner', 'comments.author'])->first();
+            ->with(['owner', 'comments.author', 'likes'])->first();
 
         return $photo ?? abort(404);
     }
@@ -102,6 +102,43 @@ class PhotoController extends Controller
         $new_comment = Comment::where('id', $comment->id)->with('author')->first();
 
         return response($new_comment, 201);
+    }
+
+    /**
+     * いいねする
+     * @param string $id
+     * @return array
+     */
+    public function like(string $id)
+    {
+        $photo = photo::where('id', $id)->with('likes')->first();
+
+        if (!$photo) {
+            abort(404);
+        }
+
+        $photo->likes()->detach(Auth::user()->id);
+        $photo->likes()->attach(Auth::user()->id);
+
+        return ["photo_id" => $id];
+    }
+
+    /**
+     * いいねを外す
+     * @param string $id
+     * @return array
+     */
+    public function unlike(string $id)
+    {
+        $photo = Photo::where('id', $id)->with('likes')->first();
+
+        if (!$photo) {
+            abort(404);
+        }
+
+        $photo->likes()->detach(Auth::user()->id);
+
+        return ["user_id" => $id];
     }
 
     /**
