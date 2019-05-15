@@ -6,6 +6,7 @@ import PhotoList from './pages/PhotoList.vue';
 import PhotoDetail from './pages/PhotoDetail.vue';
 import Login from './pages/Login.vue';
 import SystemError from './pages/errors/System.vue';
+import NotFound from './pages/errors/NotFound.vue';
 
 import store from './store';
 
@@ -41,7 +42,11 @@ const routes = [
     {
         path: '/500',
         component: SystemError
-    }
+    },
+    {
+        path: '*',
+        component: NotFound
+    },
 ];
 
 // VueRouterインスタンスを生成する
